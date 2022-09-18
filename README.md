@@ -24,14 +24,14 @@ more details.
 
 ```mermaid
 flowchart TB
-    cli_serial["# Modbus debugging\n$ ros2 topic echo /modbus/example_bus"] .-> topic_modbus[/Topic:\n/modbus/]
+    cli_serial["# Modbus debugging\n$ ros2 topic echo /modbus/example_bus"] .-> topic_modbus[/ROS2 interfaces:\n/modbus/example_bus/.../]
     subgraph modbus["Library: modbus"]
       topic_modbus
     end
     subgraph your_exe["Client process"]
       code_dds["Client code\nthat consumes\ntype definitions"]
       code_api["Client code\nthat consumes\nnative API"]
-      code_dds --> topic_modbus[/Topic:\n/modbus/example_bus/]
+      code_dds --> topic_modbus
       subgraph modbus_client_lib["Library: modbus"]
         modbus_topics["Modbus type definitions"]
         modbus_client["Modbus client API"]
