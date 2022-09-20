@@ -33,7 +33,7 @@ flowchart TB
       code_api["Client code\nthat consumes\nnative API"]
       code_dds --> topic_modbus
       subgraph modbus_client_lib["Library: modbus"]
-        modbus_topics["Modbus type definitions"]
+        modbus_topics["ROS2 interface declarations"]
         modbus_client["Modbus client API"]
         modbus_topics -.- modbus_client
       end
@@ -69,3 +69,33 @@ This interface is used by [Modbus RTU](https://github.com/openvmp/modbus_rtu)
 and [Modbus TCP](https://github.com/openvmp/modbus_tcp) libraries. But it can be
 used to implement alternative access to hardware interfaces that the clients are
 expecting to access using Modbus.
+
+## ROS2 interface
+
+Topics:
+
+- /modbus/\<bus-name\>/status/
+  - leafs_seen
+  - last_leaf
+  - last_seen
+- /modbus/\<bus-name\>/\<leaf-id\>/
+  - last_seen
+  - last_function_code
+  - last_error_code
+
+Services:
+
+- /modbus/\<bus-name\>/\<leaf-id\>/
+  - read_holding_registers
+  - preset_single_register _(not yet)_
+  - preset_multiple_registers _(not yet)_
+
+## Native interface
+
+The native interface duplicates the ROS2 service interfaces.
+The same request and response data types are reused.
+
+
+## Known Limitations
+
+- As of now, the only supported object type is 'Holding register'
