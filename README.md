@@ -1,6 +1,8 @@
-# ROS2 Modbus
+# OpenVMP
 
-## Introduction
+[![Licence](license.svg)](https://opensource.org/licenses/Apache-2.0)
+
+## ROS2 Modbus
 
 This package is an ultimate C++ implementation of Modbus for ROS2.
 
@@ -13,10 +15,10 @@ device using a Modbus interface.
 ROS2 clients use this library to communicate with other ROS2 nodes in a way
 that is abstracted away from the particular method (RTU or TCP).
 
-It is a part of [the OpenVMP project](https://github.com/openvmp/openvmp)
-But it is made to be universal and usable anywhere.
+It's a part of [the OpenVMP project](https://github.com/openvmp/openvmp)
+But it's made to be universal and usable anywhere.
 
-## Architecture
+### Architecture
 
 The below diagram explains how the modbus library fits into the overall ROS2
 architecture both on the client and server sides. See the following sections for
@@ -70,7 +72,7 @@ and [Modbus TCP](https://github.com/openvmp/modbus_tcp) libraries. But it can be
 used to implement alternative access to hardware interfaces that the clients are
 expecting to access using Modbus.
 
-## ROS2 interface
+### ROS2 interface
 
 Topics:
 
@@ -86,16 +88,16 @@ Topics:
 Services:
 
 - /modbus/\<bus-name\>/\<leaf-id\>/
-  - read_holding_registers
-  - preset_single_register _(not yet)_
-  - preset_multiple_registers _(not yet)_
+  - holding_register_read
+  - holding_register_write _(not yet)_
+  - holding_register_write_multiple _(not yet)_
 
-## Native interface
+### Native interface
 
 The native interface duplicates the ROS2 service interfaces.
 The same request and response data types are reused.
 
 
-## Known Limitations
+### Known Limitations
 
 - As of now, the only supported object type is 'Holding register'
