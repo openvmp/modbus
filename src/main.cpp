@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 OpenVMP Authors
+ * OpenVMP, 2022
  *
- * Licensed under HIPPOCRATIC LICENSE Version 3.0.
- * Generated using
- * https://firstdonoharm.dev/version/3/0/bds-bod-cl-eco-ffd-media-mil-soc-sup-sv.md
- * See https://github.com/openvmp/openvmp/blob/main/docs/License.md for more
- * details.
+ * Author: Roman Kuzmenko
+ * Created: 2022-09-24
  *
+ * Licensed under Apache License, Version 2.0.
  */
 
 #include "rclcpp/rclcpp.hpp"
