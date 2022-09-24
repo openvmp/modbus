@@ -1,0 +1,5 @@
+uint16 value
+---
+
+uint8 exception_code
+uint16 value

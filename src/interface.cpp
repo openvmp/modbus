@@ -13,7 +13,11 @@
 
 #include <functional>
 
+#include "modbus/config.hpp"
 #include "modbus/protocol.hpp"
+#include "modbus/srv/configured_holding_register_read.hpp"
+#include "modbus/srv/configured_holding_register_write.hpp"
+#include "yaml-cpp/yaml.h"
 
 namespace modbus {
 
@@ -52,6 +56,76 @@ ModbusInterface::ModbusInterface(rclcpp::Node *node) : node_{node} {
           interface_prefix_.as_string() + "/holding_register_write_multiple",
           std::bind(&ModbusInterface::holding_register_write_multiple_handler_,
                     this, std::placeholders::_1, std::placeholders::_2));
+
+  get_com_event_log = node_->create_service<modbus::srv::GetComEventLog>(
+      interface_prefix_.as_string() + "/get_com_event_log",
+      std::bind(&ModbusInterface::get_com_event_log_handler_, this,
+                std::placeholders::_1, std::placeholders::_2));
+}
+
+void ModbusInterface::generate_modbus_mappings(
+    uint8_t leaf_id, const std::string &prefix,
+    const std::string &config_filename) {
+  YAML::Node config = YAML::LoadFile(config_filename);
+
+  if (!config || config.IsNull() || !config.IsMap()) {
+    RCLCPP_ERROR(node_->get_logger(), "Failed to parse: %s",
+                 config_filename.c_str());
+    return;
+  }
+
+  auto holding_registers = config[MODBUS_CONFIG_CHAPTER_HOLDING_REGISTERS];
+  for (auto it : holding_registers) {
+    RCLCPP_DEBUG(node_->get_logger(),
+                 "Found a holding register entry in the config");
+    auto hr = it;
+    // auto hr = it.second;
+    if (!hr["name"] || !hr["addr"]) {
+      RCLCPP_ERROR(node_->get_logger(),
+                   "Incorrect syntax of the configured holding register");
+      continue;
+    }
+    auto reg = std::make_shared<ConfiguredHoldingRegister>();
+    reg->name = hr["name"].as<std::string>();
+    RCLCPP_DEBUG(node_->get_logger(),
+                 "Found a holding register entry in the config: %s",
+                 reg->name.c_str());
+
+    // TODO(clairbee): handle 'alt_names', 'comment' and 'min_delay_ms'
+    reg->addr = hr["addr"].as<uint16_t>();
+    if (hr["value"]) {
+      auto value = hr["value"];
+
+      auto min_value = value["min"];
+      if (min_value) {
+        reg->value.min_set = true;
+        reg->value.min = min_value.as<uint16_t>();
+      }
+
+      auto max_value = value["max"];
+      if (max_value) {
+        reg->value.max_set = true;
+        reg->value.max = max_value.as<uint16_t>();
+      }
+    }
+
+    auto service_get =
+        node_->create_service<modbus::srv::ConfiguredHoldingRegisterRead>(
+            prefix + "/modbus/get_" + reg->name,
+            std::bind(
+                &ModbusInterface::configured_holding_register_read_handler_,
+                this, leaf_id, reg, std::placeholders::_1,
+                std::placeholders::_2));
+    configured_get.insert(
+        {reg->name,
+         std::pair<std::shared_ptr<ConfiguredHoldingRegister>,
+                   rclcpp::Service<
+                       modbus::srv::ConfiguredHoldingRegisterRead>::SharedPtr>(
+             {reg, service_get})});
+    // TODO(clairbee): prepare setters
+  }
+
+  // TODO(clairbee): parse other types of registers
 }
 
 ModbusInterface::LeafInterface::LeafInterface(
@@ -144,37 +218,6 @@ void ModbusInterface::update_on_response_(uint8_t leaf_id, uint8_t fc,
     leafs[leaf_id]->last_error_seen->publish(msg_now);
     leafs_seen_bitmap_mutex_.unlock();
   }
-}
-
-void ModbusInterface::holding_register_read_handler_(
-    const std::shared_ptr<modbus::srv::HoldingRegisterRead::Request> request,
-    std::shared_ptr<modbus::srv::HoldingRegisterRead::Response> response) {
-  auto ret = holding_register_read_handler_real_(request, response);
-
-  RCLCPP_DEBUG(node_->get_logger(), "Received HoldingRegisterRead response");
-
-  update_on_response_(request->leaf_id, MODBUS_FC_READ_HOLDING_REGISTERS,
-                      response->exception_code, ret);
-}
-
-void ModbusInterface::holding_register_write_handler_(
-    const std::shared_ptr<modbus::srv::HoldingRegisterWrite::Request> request,
-    std::shared_ptr<modbus::srv::HoldingRegisterWrite::Response> response) {
-  auto ret = holding_register_write_handler_real_(request, response);
-
-  update_on_response_(request->leaf_id, MODBUS_FC_PRESET_SINGLE_REGISTER,
-                      response->exception_code, ret);
-}
-void ModbusInterface::holding_register_write_multiple_handler_(
-    const std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Request>
-        request,
-    std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Response>
-        response)  // TODO
-{
-  auto ret = holding_register_write_multiple_handler_real_(request, response);
-
-  update_on_response_(request->leaf_id, MODBUS_FC_PRESET_MULTIPLE_REGISTERS,
-                      response->exception_code, ret);
 }
 
 }  // namespace modbus

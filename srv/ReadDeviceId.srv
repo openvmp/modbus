@@ -1,0 +1,6 @@
+uint8 leaf_id
+---
+
+uint8 exception_code
+uint8 objects_num
+uint8[] data
