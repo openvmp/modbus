@@ -30,18 +30,28 @@ flowchart TB
     subgraph modbus["Library: modbus"]
       topic_modbus
     end
+    users["Client's\nconsumers"]
     subgraph your_exe["Client process"]
+      config["Register layout\nin YAML"]
+      subgraph modbus_client_svcs["Services: .../modbus/..."]
+        generated_services["Register-specific\nservices generated"]
+        generated_services --> topic_modbus
+      end
       code_dds["Client code\nthat consumes\ntype definitions"]
       code_api["Client code\nthat consumes\nnative API"]
       code_dds --> topic_modbus
       subgraph modbus_client_lib["Library: modbus"]
+        generate["Generate\nregister\nmappings"]
         modbus_topics["ROS2 interface declarations"]
         modbus_client["Modbus client API"]
         modbus_topics -.- modbus_client
       end
+      config ---> generate
       modbus_topics ---> code_dds
       code_api ---> modbus_client
     end
+    users --> generated_services
+    generate --> generated_services
     modbus_client --> topic_modbus
     subgraph modbus_exe["Server process"]
       modbus_server["Modbus server API"]

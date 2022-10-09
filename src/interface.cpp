@@ -2,7 +2,7 @@
  * OpenVMP, 2022
  *
  * Author: Roman Kuzmenko
- * Created: 2022-09-24
+ * Created: 2022-09-25
  *
  * Licensed under Apache License, Version 2.0.
  */
@@ -19,51 +19,22 @@
 
 namespace modbus {
 
-ModbusInterface::ModbusInterface(rclcpp::Node *node) : node_{node} {
+Interface::Interface(rclcpp::Node *node) : node_{node} {
+  callback_group_ =
+      node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+
   node->declare_parameter("modbus_prefix", "/modbus/default");
   node->get_parameter("modbus_prefix", interface_prefix_);
-
-#ifndef MODBUS_STATS_DISABLE
-  status_leafs_seen = node->create_publisher<std_msgs::msg::UInt8>(
-      interface_prefix_.as_string() + "/status/leafs_seen", 10);
-#endif  // MODBUS_STATS_DISABLE
-  status_last_leaf = node->create_publisher<std_msgs::msg::UInt8>(
-      interface_prefix_.as_string() + "/status/last_leaf", 10);
-  status_last_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      interface_prefix_.as_string() + "/status/last_seen", 10);
-
-  status_last_error_leaf = node->create_publisher<std_msgs::msg::UInt8>(
-      interface_prefix_.as_string() + "/status/last_error_leaf", 10);
-  status_last_exception_code = node->create_publisher<std_msgs::msg::UInt8>(
-      interface_prefix_.as_string() + "/status/last_exception_code", 10);
-  status_last_error_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      interface_prefix_.as_string() + "/status/last_error_seen", 10);
-
-  holding_register_read =
-      node_->create_service<modbus::srv::HoldingRegisterRead>(
-          interface_prefix_.as_string() + "/holding_register_read",
-          std::bind(&ModbusInterface::holding_register_read_handler_, this,
-                    std::placeholders::_1, std::placeholders::_2));
-  holding_register_write =
-      node_->create_service<modbus::srv::HoldingRegisterWrite>(
-          interface_prefix_.as_string() + "/holding_register_write",
-          std::bind(&ModbusInterface::holding_register_write_handler_, this,
-                    std::placeholders::_1, std::placeholders::_2));
-  holding_register_write_multiple =
-      node_->create_service<modbus::srv::HoldingRegisterWriteMultiple>(
-          interface_prefix_.as_string() + "/holding_register_write_multiple",
-          std::bind(&ModbusInterface::holding_register_write_multiple_handler_,
-                    this, std::placeholders::_1, std::placeholders::_2));
-
-  get_com_event_log = node_->create_service<modbus::srv::GetComEventLog>(
-      interface_prefix_.as_string() + "/get_com_event_log",
-      std::bind(&ModbusInterface::get_com_event_log_handler_, this,
-                std::placeholders::_1, std::placeholders::_2));
+  node->declare_parameter("modbus_leaf_id", 1);
+  node->get_parameter("modbus_leaf_id", leaf_id_);
 }
 
-void ModbusInterface::generate_modbus_mappings(
-    uint8_t leaf_id, const std::string &prefix,
-    const std::string &config_filename) {
+void Interface::generate_modbus_mappings(const std::string &prefix,
+                                         const std::string &config_filename) {
+  RCLCPP_DEBUG(node_->get_logger(),
+               "modbus::Interface::generate_modbus_mappings(%s, %s): started",
+               prefix.c_str(), config_filename.c_str());
+
   YAML::Node config = YAML::LoadFile(config_filename);
 
   if (!config || config.IsNull() || !config.IsMap()) {
@@ -110,10 +81,9 @@ void ModbusInterface::generate_modbus_mappings(
     auto service_get =
         node_->create_service<modbus::srv::ConfiguredHoldingRegisterRead>(
             prefix + "/modbus/get_" + reg->name,
-            std::bind(
-                &ModbusInterface::configured_holding_register_read_handler_,
-                this, leaf_id, reg, std::placeholders::_1,
-                std::placeholders::_2));
+            std::bind(&Interface::configured_holding_register_read_handler_,
+                      this, reg, std::placeholders::_1, std::placeholders::_2),
+            ::rmw_qos_profile_default, callback_group_);
     configured_get.insert(
         {reg->name,
          std::pair<std::shared_ptr<ConfiguredHoldingRegister>,
@@ -123,98 +93,64 @@ void ModbusInterface::generate_modbus_mappings(
     // TODO(clairbee): prepare setters
   }
 
-  // TODO(clairbee): parse other types of registers
+  // TODO(clairbee): generate services for other types of registers
+
+  RCLCPP_DEBUG(node_->get_logger(),
+               "modbus::Interface::generate_modbus_mappings(%s, %s): ended",
+               prefix.c_str(), config_filename.c_str());
 }
 
-ModbusInterface::LeafInterface::LeafInterface(
-    rclcpp::Node *node, const std::string &interface_prefix, uint8_t leaf_id) {
-  last_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      interface_prefix + "/id" + std::to_string(leaf_id) + "/last_seen", 10);
-  last_function_code = node->create_publisher<std_msgs::msg::UInt8>(
-      interface_prefix + "/id" + std::to_string(leaf_id) +
-          "/last_function_code",
-      10);
-  last_exception_code = node->create_publisher<std_msgs::msg::UInt8>(
-      interface_prefix + "/id" + std::to_string(leaf_id) +
-          "/last_exception_code",
-      10);
-  last_error_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      interface_prefix + "/id" + std::to_string(leaf_id) + "/last_error_seen",
-      10);
+void Interface::configured_holding_register_read_handler_(
+    std::shared_ptr<ConfiguredHoldingRegister> reg,
+    const std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterRead::Request>
+        request,
+    std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterRead::Response>
+        response) {
+  (void)request;  // no fields in the request
+  configured_holding_register_read(reg, response->exception_code,
+                                   response->value);
 }
 
-void ModbusInterface::leafs_seen_bitmap_update_(uint8_t leaf_id) {
-#ifndef MODBUS_STATS_DISABLE
-  uint16_t index = leaf_id >> 3;
-  uint16_t offset = leaf_id & 7;
+void Interface::configured_holding_register_read(
+    std::shared_ptr<ConfiguredHoldingRegister> reg, uint8_t &exception_code,
+    uint16_t &value) {
+  auto req = std::make_shared<modbus::srv::HoldingRegisterRead::Request>();
+  auto resp = std::make_shared<modbus::srv::HoldingRegisterRead::Response>();
 
-  leafs_seen_bitmap_mutex_.lock();
-  bool seen = leafs_seen_bitmap_[index] & (1 << offset);
-  if (!seen) {
-    leafs_seen_bitmap_[index] |= (1 << offset);
-    leafs_seen_++;
+  uint16_t leaf_id = leaf_id_.as_int();
+  RCLCPP_DEBUG(node_->get_logger(),
+               "Reading a configured holding register '%s' for leaf id: %d",
+               reg->name.c_str(), leaf_id);
+  req->leaf_id = leaf_id;
+  req->addr = reg->addr;
+  req->count = 1;
 
-    leafs.emplace(leaf_id, std::shared_ptr<LeafInterface>(new LeafInterface(
-                               node_, interface_prefix_.as_string(), leaf_id)));
+  holding_register_read(req, resp);
+  RCLCPP_DEBUG(
+      node_->get_logger(),
+      "Interface::configured_holding_register_read(): response received");
 
-    std_msgs::msg::UInt8 _;
-    _.data = leafs_seen_;
-    status_leafs_seen->publish(_);
-  }
-  leafs_seen_bitmap_mutex_.unlock();
-#endif  // MODBUS_STATS_DISABLE
-}
+  exception_code = resp->exception_code;
+  if (resp->values.size() > 0) {
+    value = resp->values[0];
 
-void ModbusInterface::update_on_response_(uint8_t leaf_id, uint8_t fc,
-                                          uint8_t exception_code,
-                                          rclcpp::FutureReturnCode ret) {
-  std_msgs::msg::UInt8 msg_leaf_id;
-  std_msgs::msg::UInt64 msg_now;
-  std_msgs::msg::UInt8 msg_zero;
-  std_msgs::msg::UInt8 msg_fc;
-
-  msg_leaf_id.data = leaf_id;
-  msg_fc.data = fc;
-
-  auto now = rclcpp::Time();
-  msg_now.data = now.nanoseconds();
-
-  leafs_seen_bitmap_update_(leaf_id);
-  if (ret == rclcpp::FutureReturnCode::SUCCESS) {
-    RCLCPP_DEBUG(node_->get_logger(), "Update stats on request completion");
-    // after this we can be sure that it's present in this->leafs
-    status_last_leaf->publish(msg_leaf_id);
-    status_last_seen->publish(msg_now);
-
-    leafs_seen_bitmap_mutex_.lock();
-    leafs[leaf_id]->last_seen->publish(msg_now);
-    leafs[leaf_id]->last_function_code->publish(msg_fc);
-    leafs_seen_bitmap_mutex_.unlock();
-
-    if (exception_code) {
-      RCLCPP_DEBUG(node_->get_logger(), "Update stats on exception");
-      std_msgs::msg::UInt8 msg_exception_code;
-      msg_exception_code.data = exception_code;
-
-      status_last_error_leaf->publish(msg_leaf_id);
-      status_last_exception_code->publish(msg_exception_code);
-      status_last_error_seen->publish(msg_now);
-
-      leafs_seen_bitmap_mutex_.lock();
-      leafs[leaf_id]->last_exception_code->publish(msg_exception_code);
-      leafs[leaf_id]->last_error_seen->publish(msg_now);
-      leafs_seen_bitmap_mutex_.unlock();
+    if (reg->value.min_set) {
+      if (reg->value.min > value) {
+        RCLCPP_ERROR(node_->get_logger(),
+                     "Leaf: %d, Holding Register: %04X, Min: %04X, Value: %04X "
+                     "(< min!)",
+                     leaf_id, reg->addr, reg->value.min, value);
+      }
     }
-  } else {
-    RCLCPP_DEBUG(node_->get_logger(), "Update stats on request failure");
-    status_last_error_leaf->publish(msg_leaf_id);
-    status_last_exception_code->publish(msg_zero);
-    status_last_error_seen->publish(msg_now);
 
-    leafs_seen_bitmap_mutex_.lock();
-    leafs[leaf_id]->last_exception_code->publish(msg_zero);
-    leafs[leaf_id]->last_error_seen->publish(msg_now);
-    leafs_seen_bitmap_mutex_.unlock();
+    if (reg->value.max_set) {
+      if (reg->value.max < value) {
+        RCLCPP_ERROR(node_->get_logger(),
+                     "Leaf: %d, Holding Register: %04X, Max: %04X, Value: %04X "
+                     "(> max!)",
+                     leaf_id, reg->addr, reg->value.max, value);
+      }
+    }
   }
 }
 

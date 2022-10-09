@@ -10,15 +10,13 @@
 #include <functional>
 
 #include "modbus/config.hpp"
-#include "modbus/interface.hpp"
+#include "modbus/implementation.hpp"
 #include "modbus/protocol.hpp"
-#include "modbus/srv/configured_holding_register_read.hpp"
-#include "modbus/srv/configured_holding_register_write.hpp"
 #include "yaml-cpp/yaml.h"
 
 namespace modbus {
 
-void ModbusInterface::get_com_event_log_handler_(
+void Implementation::get_com_event_log(
     const std::shared_ptr<modbus::srv::GetComEventLog::Request> request,
     std::shared_ptr<modbus::srv::GetComEventLog::Response> response) {
   auto ret = get_com_event_log_handler_real_(request, response);
@@ -29,7 +27,7 @@ void ModbusInterface::get_com_event_log_handler_(
                       response->exception_code, ret);
 }
 
-void ModbusInterface::read_device_id_handler_(
+void Implementation::read_device_id(
     const std::shared_ptr<modbus::srv::ReadDeviceId::Request> request,
     std::shared_ptr<modbus::srv::ReadDeviceId::Response> response) {
   auto ret = read_device_id_handler_real_(request, response);

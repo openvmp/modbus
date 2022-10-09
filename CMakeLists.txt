@@ -37,12 +37,14 @@ include_directories(
 
 set(project_SOURCE_FILES
   src/interface.cpp
+  src/interface_remote.cpp
+  src/implementation.cpp
   src/proto_holding_registers.cpp
   src/proto_misc.cpp
 )
 
 set(project_LIBRARIES
-${rclcpp_LIBRARIES}
+  ${rclcpp_LIBRARIES}
   ${YAML_CPP_LIBRARIES}
 )
 
@@ -62,7 +64,7 @@ install(TARGETS
 )
 
 # Library target
-add_library(${PROJECT_NAME}_native ${project_SOURCE_FILES})
+add_library(${PROJECT_NAME}_native src/factory.cpp ${project_SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME}_native ${project_LIBRARIES} "${cpp_typesupport_target}")
 ament_target_dependencies(${PROJECT_NAME}_native ${project_DEPENDENCIES})
 ament_export_targets(${PROJECT_NAME}_native_library HAS_LIBRARY_TARGET)
