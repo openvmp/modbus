@@ -2,6 +2,9 @@
 
 [![License](./license.svg)](./LICENSE.txt)
 
+This package is a part of [the OpenVMP project](https://github.com/openvmp/openvmp).
+But it's designed to be universal and usable independently from the rest of OpenVMP or in a combination with select OpenVMP packages.
+
 ## ROS2 Modbus
 
 This package is an ultimate C++ implementation of Modbus for ROS2.
@@ -14,9 +17,6 @@ device using a Modbus interface.
 
 ROS2 clients use this library to communicate with other ROS2 nodes in a way
 that is abstracted away from the particular method (RTU or TCP).
-
-It's a part of [the OpenVMP project](https://github.com/openvmp/openvmp)
-But it's made to be universal and usable anywhere.
 
 ### Architecture
 
