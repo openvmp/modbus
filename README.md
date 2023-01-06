@@ -112,4 +112,3 @@ The same request and response data types are reused.
 
 - As of now, the only supported object type is 'Holding register'
 
-![ROS/ROS2 index package for OpenVMP module: modbus](https://www.google-analytics.com/collect?v=1&tid=UA-242596187-2&cid=555&aip=1&t=event&ec=github&ea=md&dp=%2Readme.md&dt=ROS2%20package%20for%20modbus)
