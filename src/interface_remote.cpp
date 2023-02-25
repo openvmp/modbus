@@ -18,7 +18,7 @@
 namespace modbus {
 
 RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
-  auto prefix = interface_prefix_.as_string();
+  auto prefix = get_prefix_();
 
   RCLCPP_DEBUG(node_->get_logger(),
                "modbus::RemoteInterface::RemoteInterface(): Connecting to the "

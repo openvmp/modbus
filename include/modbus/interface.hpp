@@ -82,12 +82,15 @@ class Interface {
  protected:
   rclcpp::Node *node_;
   rclcpp::CallbackGroup::SharedPtr callback_group_;
-  rclcpp::Parameter interface_prefix_;
   // leaf_id_ is the default value.
   // Doesn't make sense on the server side (e.g. 'modbus_rtu_standalone').
   rclcpp::Parameter leaf_id_;
 
+  std::string get_prefix_();
+
  private:
+  rclcpp::Parameter interface_prefix_;
+
   // configured_holding_register_read is the API call to read configured holding
   // registers. Service handlers call this function to do the job.
   void configured_holding_register_read(

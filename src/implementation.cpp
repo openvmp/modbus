@@ -20,7 +20,7 @@
 namespace modbus {
 
 Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
-  auto prefix = interface_prefix_.as_string();
+  auto prefix = get_prefix_();
 
 #ifndef MODBUS_STATS_DISABLE
   status_leafs_seen = node->create_publisher<std_msgs::msg::UInt8>(
@@ -71,6 +71,7 @@ Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
 
 Implementation::LeafInterface::LeafInterface(
     rclcpp::Node *node, const std::string &interface_prefix, uint8_t leaf_id) {
+
   last_seen = node->create_publisher<std_msgs::msg::UInt64>(
       interface_prefix + "/id" + std::to_string(leaf_id) + "/last_seen", 10);
   last_function_code = node->create_publisher<std_msgs::msg::UInt8>(
@@ -101,7 +102,7 @@ void Implementation::leafs_seen_bitmap_update_(uint8_t leaf_id) {
     // publisher: rcl node's context is invalid
     //
     // leafs.emplace(leaf_id, std::make_shared<LeafInterface>(
-    //                            node_, interface_prefix_.as_string(),
+    //                            node_, get_prefix_(),
     //                            leaf_id));
 
     std_msgs::msg::UInt8 _;
