@@ -57,6 +57,9 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
 void RemoteInterface::holding_register_read(
     const std::shared_ptr<modbus::srv::HoldingRegisterRead::Request> request,
     std::shared_ptr<modbus::srv::HoldingRegisterRead::Response> response) {
+  if (!request->leaf_id) {
+    request->leaf_id = leaf_id_.as_int();
+  }
   auto f = clnt_holding_register_read->async_send_request(request);
   f.wait();
 
@@ -75,6 +78,9 @@ void RemoteInterface::holding_register_read(
 void RemoteInterface::holding_register_write(
     const std::shared_ptr<modbus::srv::HoldingRegisterWrite::Request> request,
     std::shared_ptr<modbus::srv::HoldingRegisterWrite::Response> response) {
+  if (!request->leaf_id) {
+    request->leaf_id = leaf_id_.as_int();
+  }
   auto f = clnt_holding_register_write->async_send_request(request);
   f.wait();
   *response = *f.get();
@@ -85,6 +91,9 @@ void RemoteInterface::holding_register_write_multiple(
         request,
     std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Response>
         response) {
+  if (!request->leaf_id) {
+    request->leaf_id = leaf_id_.as_int();
+  }
   auto f = clnt_holding_register_write_multiple->async_send_request(request);
   f.wait();
   *response = *f.get();
@@ -93,6 +102,9 @@ void RemoteInterface::holding_register_write_multiple(
 void RemoteInterface::get_com_event_log(
     const std::shared_ptr<modbus::srv::GetComEventLog::Request> request,
     std::shared_ptr<modbus::srv::GetComEventLog::Response> response) {
+  if (!request->leaf_id) {
+    request->leaf_id = leaf_id_.as_int();
+  }
   auto f = clnt_get_com_event_log->async_send_request(request);
   f.wait();
   *response = *f.get();
@@ -101,6 +113,9 @@ void RemoteInterface::get_com_event_log(
 void RemoteInterface::read_device_id(
     const std::shared_ptr<modbus::srv::ReadDeviceId::Request> request,
     std::shared_ptr<modbus::srv::ReadDeviceId::Response> response) {
+  if (!request->leaf_id) {
+    request->leaf_id = leaf_id_.as_int();
+  }
   auto f = clnt_read_device_id->async_send_request(request);
   f.wait();
   *response = *f.get();
