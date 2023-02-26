@@ -102,6 +102,16 @@ class Interface {
           request,
       std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterRead::Response>
           response);
+
+  void configured_holding_register_write(
+      std::shared_ptr<ConfiguredHoldingRegister> reg, uint16_t value,
+      uint8_t &exception_code);
+  void configured_holding_register_write_handler_(
+      std::shared_ptr<ConfiguredHoldingRegister> reg,
+      const std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterWrite::Request>
+          request,
+      std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterWrite::Response>
+          response);
 };
 
 }  // namespace modbus

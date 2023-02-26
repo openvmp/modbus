@@ -99,7 +99,21 @@ void Interface::generate_modbus_mappings(const std::string &prefix,
                    rclcpp::Service<
                        modbus::srv::ConfiguredHoldingRegisterRead>::SharedPtr>(
              {reg, service_get})});
-    // TODO(clairbee): prepare setters
+
+    if (!hr["read_only"]) {
+      auto service_set =
+          node_->create_service<modbus::srv::ConfiguredHoldingRegisterWrite>(
+              prefix + "/modbus/set_" + reg->name,
+              std::bind(&Interface::configured_holding_register_write_handler_,
+                        this, reg, std::placeholders::_1, std::placeholders::_2),
+              ::rmw_qos_profile_default, callback_group_);
+      configured_set.insert(
+          {reg->name,
+           std::pair<std::shared_ptr<ConfiguredHoldingRegister>,
+                     rclcpp::Service<
+                         modbus::srv::ConfiguredHoldingRegisterWrite>::SharedPtr>(
+               {reg, service_set})});
+    }
   }
 
   // TODO(clairbee): generate services for other types of registers
@@ -161,6 +175,40 @@ void Interface::configured_holding_register_read(
       }
     }
   }
+}
+
+void Interface::configured_holding_register_write_handler_(
+    std::shared_ptr<ConfiguredHoldingRegister> reg,
+    const std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterWrite::Request>
+        request,
+    std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterWrite::Response>
+        response) {
+  configured_holding_register_write(reg,
+                                    request->value,
+                                    response->exception_code);
+}
+
+void Interface::configured_holding_register_write(
+    std::shared_ptr<ConfiguredHoldingRegister> reg,
+    uint16_t value,
+    uint8_t &exception_code) {
+  auto req = std::make_shared<modbus::srv::HoldingRegisterWrite::Request>();
+  auto resp = std::make_shared<modbus::srv::HoldingRegisterWrite::Response>();
+
+  uint16_t leaf_id = leaf_id_.as_int();
+  RCLCPP_DEBUG(node_->get_logger(),
+               "Writing '%u' to a configured holding register '%s' for leaf id: %d",
+               (unsigned int)value, reg->name.c_str(), leaf_id);
+  req->leaf_id = leaf_id;
+  req->addr = reg->addr;
+  req->value = value;
+
+  holding_register_write(req, resp);
+  RCLCPP_DEBUG(
+      node_->get_logger(),
+      "Interface::configured_holding_register_read(): response received");
+
+  exception_code = resp->exception_code;
 }
 
 }  // namespace modbus
