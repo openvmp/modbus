@@ -185,13 +185,15 @@ void Interface::configured_holding_register_write_handler_(
         response) {
   configured_holding_register_write(reg,
                                     request->value,
-                                    response->exception_code);
+                                    response->exception_code,
+				    response->value);
 }
 
 void Interface::configured_holding_register_write(
     std::shared_ptr<ConfiguredHoldingRegister> reg,
     uint16_t value,
-    uint8_t &exception_code) {
+    uint8_t &exception_code,
+    uint16_t &response_value) {
   auto req = std::make_shared<modbus::srv::HoldingRegisterWrite::Request>();
   auto resp = std::make_shared<modbus::srv::HoldingRegisterWrite::Response>();
 
@@ -209,6 +211,7 @@ void Interface::configured_holding_register_write(
       "Interface::configured_holding_register_read(): response received");
 
   exception_code = resp->exception_code;
+  response_value = resp->value;
 }
 
 }  // namespace modbus

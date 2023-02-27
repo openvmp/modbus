@@ -105,7 +105,7 @@ class Interface {
 
   void configured_holding_register_write(
       std::shared_ptr<ConfiguredHoldingRegister> reg, uint16_t value,
-      uint8_t &exception_code);
+      uint8_t &exception_code, uint16_t &response_value);
   void configured_holding_register_write_handler_(
       std::shared_ptr<ConfiguredHoldingRegister> reg,
       const std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterWrite::Request>
