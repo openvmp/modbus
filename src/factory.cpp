@@ -11,7 +11,6 @@
 
 #include <exception>
 
-#include "modbus/implementation.hpp"
 #include "modbus/interface_remote.hpp"
 
 namespace modbus {

@@ -19,7 +19,7 @@
 
 namespace modbus {
 
-class RemoteInterface : public Interface {
+class RemoteInterface final : public Interface {
  public:
   RemoteInterface(rclcpp::Node *node);
   virtual ~RemoteInterface() {}
