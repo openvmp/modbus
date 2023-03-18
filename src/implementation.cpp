@@ -24,19 +24,31 @@ Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
 
 #ifndef MODBUS_STATS_DISABLE
   status_leafs_seen = node->create_publisher<std_msgs::msg::UInt8>(
-      prefix + "/status/leafs_seen", 10);
+      prefix + "/status/leafs_seen",
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
 #endif  // MODBUS_STATS_DISABLE
   status_last_leaf = node->create_publisher<std_msgs::msg::UInt8>(
-      prefix + "/status/last_leaf", 10);
+      prefix + "/status/last_leaf",
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
   status_last_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      prefix + "/status/last_seen", 10);
+      prefix + "/status/last_seen",
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
 
   status_last_error_leaf = node->create_publisher<std_msgs::msg::UInt8>(
-      prefix + "/status/last_error_leaf", 10);
+      prefix + "/status/last_error_leaf",
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
   status_last_exception_code = node->create_publisher<std_msgs::msg::UInt8>(
-      prefix + "/status/last_exception_code", 10);
+      prefix + "/status/last_exception_code",
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
   status_last_error_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      prefix + "/status/last_error_seen", 10);
+      prefix + "/status/last_error_seen",
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
 
   srv_holding_register_read =
       node_->create_service<modbus::srv::HoldingRegisterRead>(
@@ -71,20 +83,24 @@ Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
 
 Implementation::LeafInterface::LeafInterface(
     rclcpp::Node *node, const std::string &interface_prefix, uint8_t leaf_id) {
-
   last_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      interface_prefix + "/id" + std::to_string(leaf_id) + "/last_seen", 10);
+      interface_prefix + "/id" + std::to_string(leaf_id) + "/last_seen",
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
   last_function_code = node->create_publisher<std_msgs::msg::UInt8>(
       interface_prefix + "/id" + std::to_string(leaf_id) +
           "/last_function_code",
-      10);
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
   last_exception_code = node->create_publisher<std_msgs::msg::UInt8>(
       interface_prefix + "/id" + std::to_string(leaf_id) +
           "/last_exception_code",
-      10);
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
   last_error_seen = node->create_publisher<std_msgs::msg::UInt64>(
       interface_prefix + "/id" + std::to_string(leaf_id) + "/last_error_seen",
-      10);
+      rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT |
+          rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST);
 }
 
 void Implementation::leafs_seen_bitmap_update_(uint8_t leaf_id) {
