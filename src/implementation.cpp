@@ -7,17 +7,17 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "modbus/implementation.hpp"
+#include "ros2_modbus/implementation.hpp"
 
 #include <functional>
 
-#include "modbus/config.hpp"
-#include "modbus/protocol.hpp"
-#include "modbus/srv/configured_holding_register_read.hpp"
-#include "modbus/srv/configured_holding_register_write.hpp"
+#include "ros2_modbus/config.hpp"
+#include "ros2_modbus/protocol.hpp"
+#include "ros2_modbus/srv/configured_holding_register_read.hpp"
+#include "ros2_modbus/srv/configured_holding_register_write.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace modbus {
+namespace ros2_modbus {
 
 Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
   auto prefix = get_prefix_();
@@ -52,31 +52,29 @@ Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
   status_last_error_seen = node->create_publisher<std_msgs::msg::UInt64>(
       prefix + "/status/last_error_seen", qos);
 
-  srv_holding_register_read =
-      node_->create_service<modbus::srv::HoldingRegisterRead>(
-          prefix + MODBUS_SERVICE_HOLDING_REGISTER_READ,
-          std::bind(&Interface::holding_register_read, this,
-                    std::placeholders::_1, std::placeholders::_2),
-          ::rmw_qos_profile_default, callback_group_);
-  srv_holding_register_write =
-      node_->create_service<modbus::srv::HoldingRegisterWrite>(
-          prefix + MODBUS_SERVICE_HOLDING_REGISTER_WRITE,
-          std::bind(&Interface::holding_register_write, this,
-                    std::placeholders::_1, std::placeholders::_2),
-          ::rmw_qos_profile_default, callback_group_);
+  srv_holding_register_read = node_->create_service<srv::HoldingRegisterRead>(
+      prefix + MODBUS_SERVICE_HOLDING_REGISTER_READ,
+      std::bind(&Interface::holding_register_read, this, std::placeholders::_1,
+                std::placeholders::_2),
+      ::rmw_qos_profile_default, callback_group_);
+  srv_holding_register_write = node_->create_service<srv::HoldingRegisterWrite>(
+      prefix + MODBUS_SERVICE_HOLDING_REGISTER_WRITE,
+      std::bind(&Interface::holding_register_write, this, std::placeholders::_1,
+                std::placeholders::_2),
+      ::rmw_qos_profile_default, callback_group_);
   srv_holding_register_write_multiple =
-      node_->create_service<modbus::srv::HoldingRegisterWriteMultiple>(
+      node_->create_service<srv::HoldingRegisterWriteMultiple>(
           prefix + MODBUS_SERVICE_HOLDING_REGISTER_WRITE_MULTIPLE,
           std::bind(&Interface::holding_register_write_multiple, this,
                     std::placeholders::_1, std::placeholders::_2),
           ::rmw_qos_profile_default, callback_group_);
 
-  srv_get_com_event_log = node_->create_service<modbus::srv::GetComEventLog>(
+  srv_get_com_event_log = node_->create_service<srv::GetComEventLog>(
       prefix + MODBUS_SERVICE_GET_COM_VENT_LOG,
       std::bind(&Interface::get_com_event_log, this, std::placeholders::_1,
                 std::placeholders::_2),
       ::rmw_qos_profile_default, callback_group_);
-  srv_read_device_id = node_->create_service<modbus::srv::ReadDeviceId>(
+  srv_read_device_id = node_->create_service<srv::ReadDeviceId>(
       prefix + MODBUS_SERVICE_READ_DEBICE_ID,
       std::bind(&Interface::read_device_id, this, std::placeholders::_1,
                 std::placeholders::_2),
@@ -199,4 +197,4 @@ void Implementation::update_on_response_(uint8_t leaf_id, uint8_t fc,
   }
 }
 
-}  // namespace modbus
+}  // namespace ros2_modbus

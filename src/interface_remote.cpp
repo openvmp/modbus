@@ -7,15 +7,15 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "modbus/interface_remote.hpp"
+#include "ros2_modbus/interface_remote.hpp"
 
 #include <functional>
 
-#include "modbus/config.hpp"
-#include "modbus/protocol.hpp"
+#include "ros2_modbus/config.hpp"
+#include "ros2_modbus/protocol.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace modbus {
+namespace ros2_modbus {
 
 RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
   auto prefix = get_prefix_();
@@ -25,22 +25,20 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
                "remote interface: %s",
                prefix.c_str());
 
-  clnt_holding_register_read =
-      node->create_client<modbus::srv::HoldingRegisterRead>(
-          prefix + MODBUS_SERVICE_HOLDING_REGISTER_READ,
-          ::rmw_qos_profile_default, callback_group_);
-  clnt_holding_register_write =
-      node->create_client<modbus::srv::HoldingRegisterWrite>(
-          prefix + MODBUS_SERVICE_HOLDING_REGISTER_WRITE,
-          ::rmw_qos_profile_default, callback_group_);
+  clnt_holding_register_read = node->create_client<srv::HoldingRegisterRead>(
+      prefix + MODBUS_SERVICE_HOLDING_REGISTER_READ, ::rmw_qos_profile_default,
+      callback_group_);
+  clnt_holding_register_write = node->create_client<srv::HoldingRegisterWrite>(
+      prefix + MODBUS_SERVICE_HOLDING_REGISTER_WRITE, ::rmw_qos_profile_default,
+      callback_group_);
   clnt_holding_register_write_multiple =
-      node->create_client<modbus::srv::HoldingRegisterWriteMultiple>(
+      node->create_client<srv::HoldingRegisterWriteMultiple>(
           prefix + MODBUS_SERVICE_HOLDING_REGISTER_WRITE_MULTIPLE,
           ::rmw_qos_profile_default, callback_group_);
-  clnt_get_com_event_log = node->create_client<modbus::srv::GetComEventLog>(
+  clnt_get_com_event_log = node->create_client<srv::GetComEventLog>(
       prefix + MODBUS_SERVICE_GET_COM_VENT_LOG, ::rmw_qos_profile_default,
       callback_group_);
-  clnt_read_device_id = node->create_client<modbus::srv::ReadDeviceId>(
+  clnt_read_device_id = node->create_client<srv::ReadDeviceId>(
       prefix + MODBUS_SERVICE_READ_DEBICE_ID, ::rmw_qos_profile_default,
       callback_group_);
 
@@ -55,8 +53,8 @@ RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
 }
 
 void RemoteInterface::holding_register_read(
-    const std::shared_ptr<modbus::srv::HoldingRegisterRead::Request> request,
-    std::shared_ptr<modbus::srv::HoldingRegisterRead::Response> response) {
+    const std::shared_ptr<srv::HoldingRegisterRead::Request> request,
+    std::shared_ptr<srv::HoldingRegisterRead::Response> response) {
   if (!request->leaf_id) {
     request->leaf_id = leaf_id_.as_int();
   }
@@ -76,8 +74,8 @@ void RemoteInterface::holding_register_read(
 }
 
 void RemoteInterface::holding_register_write(
-    const std::shared_ptr<modbus::srv::HoldingRegisterWrite::Request> request,
-    std::shared_ptr<modbus::srv::HoldingRegisterWrite::Response> response) {
+    const std::shared_ptr<srv::HoldingRegisterWrite::Request> request,
+    std::shared_ptr<srv::HoldingRegisterWrite::Response> response) {
   if (!request->leaf_id) {
     request->leaf_id = leaf_id_.as_int();
   }
@@ -87,10 +85,8 @@ void RemoteInterface::holding_register_write(
 }
 
 void RemoteInterface::holding_register_write_multiple(
-    const std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Request>
-        request,
-    std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Response>
-        response) {
+    const std::shared_ptr<srv::HoldingRegisterWriteMultiple::Request> request,
+    std::shared_ptr<srv::HoldingRegisterWriteMultiple::Response> response) {
   if (!request->leaf_id) {
     request->leaf_id = leaf_id_.as_int();
   }
@@ -100,8 +96,8 @@ void RemoteInterface::holding_register_write_multiple(
 }
 
 void RemoteInterface::get_com_event_log(
-    const std::shared_ptr<modbus::srv::GetComEventLog::Request> request,
-    std::shared_ptr<modbus::srv::GetComEventLog::Response> response) {
+    const std::shared_ptr<srv::GetComEventLog::Request> request,
+    std::shared_ptr<srv::GetComEventLog::Response> response) {
   if (!request->leaf_id) {
     request->leaf_id = leaf_id_.as_int();
   }
@@ -111,8 +107,8 @@ void RemoteInterface::get_com_event_log(
 }
 
 void RemoteInterface::read_device_id(
-    const std::shared_ptr<modbus::srv::ReadDeviceId::Request> request,
-    std::shared_ptr<modbus::srv::ReadDeviceId::Response> response) {
+    const std::shared_ptr<srv::ReadDeviceId::Request> request,
+    std::shared_ptr<srv::ReadDeviceId::Response> response) {
   if (!request->leaf_id) {
     request->leaf_id = leaf_id_.as_int();
   }
@@ -121,4 +117,4 @@ void RemoteInterface::read_device_id(
   *response = *f.get();
 }
 
-}  // namespace modbus
+}  // namespace ros2_modbus

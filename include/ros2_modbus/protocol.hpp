@@ -27,6 +27,6 @@
 #define MODBUS_EXC_GATEWAY_PATH_UNAVAILABLE 0x0A
 #define MODBUS_EXC_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND 0x0B
 
-namespace modbus {}
+namespace ros2_modbus {}
 
 #endif  // OPENVMP_MODBUS_PROTOCOL_H

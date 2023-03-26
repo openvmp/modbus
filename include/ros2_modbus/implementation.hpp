@@ -14,14 +14,14 @@
 #include <memory>
 #include <string>
 
-#include "modbus/interface.hpp"
-#include "modbus/srv/get_com_event_log.hpp"
-#include "modbus/srv/holding_register_read.hpp"
-#include "modbus/srv/holding_register_write.hpp"
-#include "modbus/srv/holding_register_write_multiple.hpp"
-#include "modbus/srv/read_device_id.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/time.hpp"
+#include "ros2_modbus/interface.hpp"
+#include "ros2_modbus/srv/get_com_event_log.hpp"
+#include "ros2_modbus/srv/holding_register_read.hpp"
+#include "ros2_modbus/srv/holding_register_write.hpp"
+#include "ros2_modbus/srv/holding_register_write_multiple.hpp"
+#include "ros2_modbus/srv/read_device_id.hpp"
 #include "std_msgs/msg/u_int16.hpp"
 #include "std_msgs/msg/u_int64.hpp"
 #include "std_msgs/msg/u_int8.hpp"
@@ -38,7 +38,7 @@
     MODBUS_PUBLISH(type, name, name##_value_) \
   }
 
-namespace modbus {
+namespace ros2_modbus {
 
 class Implementation : public Interface {
  public:
@@ -76,38 +76,36 @@ class Implementation : public Interface {
   std::map<uint8_t, std::shared_ptr<LeafInterface>> leafs;
 #endif  // MODBUS_STATS_DISABLE
 
-  rclcpp::Service<modbus::srv::HoldingRegisterRead>::SharedPtr
+  rclcpp::Service<srv::HoldingRegisterRead>::SharedPtr
       srv_holding_register_read;
-  rclcpp::Service<modbus::srv::HoldingRegisterWrite>::SharedPtr
+  rclcpp::Service<srv::HoldingRegisterWrite>::SharedPtr
       srv_holding_register_write;
-  rclcpp::Service<modbus::srv::HoldingRegisterWriteMultiple>::SharedPtr
+  rclcpp::Service<srv::HoldingRegisterWriteMultiple>::SharedPtr
       srv_holding_register_write_multiple;
-  rclcpp::Service<modbus::srv::GetComEventLog>::SharedPtr srv_get_com_event_log;
-  rclcpp::Service<modbus::srv::ReadDeviceId>::SharedPtr srv_read_device_id;
+  rclcpp::Service<srv::GetComEventLog>::SharedPtr srv_get_com_event_log;
+  rclcpp::Service<srv::ReadDeviceId>::SharedPtr srv_read_device_id;
 
  protected:
   // TO BE IMPLEMENTED BY RTU/TCP/ASCII
   // Operations with holding registers
   virtual rclcpp::FutureReturnCode holding_register_read_handler_real_(
-      const std::shared_ptr<modbus::srv::HoldingRegisterRead::Request> request,
-      std::shared_ptr<modbus::srv::HoldingRegisterRead::Response> response) = 0;
+      const std::shared_ptr<srv::HoldingRegisterRead::Request> request,
+      std::shared_ptr<srv::HoldingRegisterRead::Response> response) = 0;
   virtual rclcpp::FutureReturnCode holding_register_write_handler_real_(
-      const std::shared_ptr<modbus::srv::HoldingRegisterWrite::Request> request,
-      std::shared_ptr<modbus::srv::HoldingRegisterWrite::Response>
-          response) = 0;
+      const std::shared_ptr<srv::HoldingRegisterWrite::Request> request,
+      std::shared_ptr<srv::HoldingRegisterWrite::Response> response) = 0;
   virtual rclcpp::FutureReturnCode
   holding_register_write_multiple_handler_real_(
-      const std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Request>
-          request,
-      std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Response>
+      const std::shared_ptr<srv::HoldingRegisterWriteMultiple::Request> request,
+      std::shared_ptr<srv::HoldingRegisterWriteMultiple::Response>
           response) = 0;
   // Misc operations
   virtual rclcpp::FutureReturnCode get_com_event_log_handler_real_(
-      const std::shared_ptr<modbus::srv::GetComEventLog::Request> request,
-      std::shared_ptr<modbus::srv::GetComEventLog::Response> response) = 0;
+      const std::shared_ptr<srv::GetComEventLog::Request> request,
+      std::shared_ptr<srv::GetComEventLog::Response> response) = 0;
   virtual rclcpp::FutureReturnCode read_device_id_handler_real_(
-      const std::shared_ptr<modbus::srv::ReadDeviceId::Request> request,
-      std::shared_ptr<modbus::srv::ReadDeviceId::Response> response) = 0;
+      const std::shared_ptr<srv::ReadDeviceId::Request> request,
+      std::shared_ptr<srv::ReadDeviceId::Response> response) = 0;
 
  private:
 #ifndef MODBUS_STATS_DISABLE
@@ -121,25 +119,23 @@ class Implementation : public Interface {
 
   // SERVICES
   virtual void holding_register_read(
-      const std::shared_ptr<modbus::srv::HoldingRegisterRead::Request> request,
-      std::shared_ptr<modbus::srv::HoldingRegisterRead::Response> response)
-      override;
+      const std::shared_ptr<srv::HoldingRegisterRead::Request> request,
+      std::shared_ptr<srv::HoldingRegisterRead::Response> response) override;
   virtual void holding_register_write(
-      const std::shared_ptr<modbus::srv::HoldingRegisterWrite::Request> request,
-      std::shared_ptr<modbus::srv::HoldingRegisterWrite::Response> response)
-      override;
+      const std::shared_ptr<srv::HoldingRegisterWrite::Request> request,
+      std::shared_ptr<srv::HoldingRegisterWrite::Response> response) override;
   virtual void holding_register_write_multiple(
-      const std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Request>,
-      std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Response>
-          response) override;
+      const std::shared_ptr<srv::HoldingRegisterWriteMultiple::Request>,
+      std::shared_ptr<srv::HoldingRegisterWriteMultiple::Response> response)
+      override;
   virtual void get_com_event_log(
-      const std::shared_ptr<modbus::srv::GetComEventLog::Request> request,
-      std::shared_ptr<modbus::srv::GetComEventLog::Response> response) override;
+      const std::shared_ptr<srv::GetComEventLog::Request> request,
+      std::shared_ptr<srv::GetComEventLog::Response> response) override;
   virtual void read_device_id(
-      const std::shared_ptr<modbus::srv::ReadDeviceId::Request> request,
-      std::shared_ptr<modbus::srv::ReadDeviceId::Response> response) override;
+      const std::shared_ptr<srv::ReadDeviceId::Request> request,
+      std::shared_ptr<srv::ReadDeviceId::Response> response) override;
 };
 
-}  // namespace modbus
+}  // namespace ros2_modbus
 
 #endif  // OPENVMP_MODBUS_IMPLEMENTATION_H

@@ -9,16 +9,16 @@
 
 #include <functional>
 
-#include "modbus/config.hpp"
-#include "modbus/implementation.hpp"
-#include "modbus/protocol.hpp"
+#include "ros2_modbus/config.hpp"
+#include "ros2_modbus/implementation.hpp"
+#include "ros2_modbus/protocol.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace modbus {
+namespace ros2_modbus {
 
 void Implementation::get_com_event_log(
-    const std::shared_ptr<modbus::srv::GetComEventLog::Request> request,
-    std::shared_ptr<modbus::srv::GetComEventLog::Response> response) {
+    const std::shared_ptr<srv::GetComEventLog::Request> request,
+    std::shared_ptr<srv::GetComEventLog::Response> response) {
   auto ret = get_com_event_log_handler_real_(request, response);
 
   RCLCPP_DEBUG(node_->get_logger(), "Received GetComEventLog response");
@@ -28,8 +28,8 @@ void Implementation::get_com_event_log(
 }
 
 void Implementation::read_device_id(
-    const std::shared_ptr<modbus::srv::ReadDeviceId::Request> request,
-    std::shared_ptr<modbus::srv::ReadDeviceId::Response> response) {
+    const std::shared_ptr<srv::ReadDeviceId::Request> request,
+    std::shared_ptr<srv::ReadDeviceId::Response> response) {
   auto ret = read_device_id_handler_real_(request, response);
 
   RCLCPP_DEBUG(node_->get_logger(), "Received ReadDeviceId response");
@@ -38,4 +38,4 @@ void Implementation::read_device_id(
                       response->exception_code, ret);
 }
 
-}  // namespace modbus
+}  // namespace ros2_modbus

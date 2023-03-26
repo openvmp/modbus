@@ -7,23 +7,24 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "modbus/interface.hpp"
+#include "ros2_modbus/interface.hpp"
 
 #include <functional>
 
-#include "modbus/config.hpp"
-#include "modbus/protocol.hpp"
-#include "modbus/srv/configured_holding_register_read.hpp"
-#include "modbus/srv/configured_holding_register_write.hpp"
+#include "ros2_modbus/config.hpp"
+#include "ros2_modbus/protocol.hpp"
+#include "ros2_modbus/srv/configured_holding_register_read.hpp"
+#include "ros2_modbus/srv/configured_holding_register_write.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace modbus {
+namespace ros2_modbus {
 
 Interface::Interface(rclcpp::Node *node) : node_{node} {
   callback_group_ =
       node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
 
-  node->declare_parameter("modbus_prefix", "/modbus/" + std::string(node_->get_name()));
+  node->declare_parameter("modbus_prefix",
+                          "/modbus/" + std::string(node_->get_name()));
   node->get_parameter("modbus_prefix", interface_prefix_);
   node->declare_parameter("modbus_leaf_id", 1);
   node->get_parameter("modbus_leaf_id", leaf_id_);
@@ -31,7 +32,7 @@ Interface::Interface(rclcpp::Node *node) : node_{node} {
 
 std::string Interface::get_prefix_() {
   std::string prefix = std::string(node_->get_namespace());
-  if (prefix.length() >0 && prefix[prefix.length()-1] == '/') {
+  if (prefix.length() > 0 && prefix[prefix.length() - 1] == '/') {
     prefix = prefix.substr(0, prefix.length() - 1);
   }
   prefix += interface_prefix_.as_string();
@@ -41,7 +42,7 @@ std::string Interface::get_prefix_() {
 void Interface::generate_modbus_mappings(const std::string &prefix,
                                          const std::string &config_filename) {
   RCLCPP_DEBUG(node_->get_logger(),
-               "modbus::Interface::generate_modbus_mappings(%s, %s): started",
+               "_modbus::Interface::generate_modbus_mappings(%s, %s): started",
                prefix.c_str(), config_filename.c_str());
 
   YAML::Node config = YAML::LoadFile(config_filename);
@@ -88,30 +89,31 @@ void Interface::generate_modbus_mappings(const std::string &prefix,
     }
 
     auto service_get =
-        node_->create_service<modbus::srv::ConfiguredHoldingRegisterRead>(
+        node_->create_service<srv::ConfiguredHoldingRegisterRead>(
             prefix + "/modbus/get_" + reg->name,
             std::bind(&Interface::configured_holding_register_read_handler_,
                       this, reg, std::placeholders::_1, std::placeholders::_2),
             ::rmw_qos_profile_default, callback_group_);
     configured_get.insert(
         {reg->name,
-         std::pair<std::shared_ptr<ConfiguredHoldingRegister>,
-                   rclcpp::Service<
-                       modbus::srv::ConfiguredHoldingRegisterRead>::SharedPtr>(
+         std::pair<
+             std::shared_ptr<ConfiguredHoldingRegister>,
+             rclcpp::Service<srv::ConfiguredHoldingRegisterRead>::SharedPtr>(
              {reg, service_get})});
 
     if (!hr["read_only"]) {
       auto service_set =
-          node_->create_service<modbus::srv::ConfiguredHoldingRegisterWrite>(
+          node_->create_service<srv::ConfiguredHoldingRegisterWrite>(
               prefix + "/modbus/set_" + reg->name,
               std::bind(&Interface::configured_holding_register_write_handler_,
-                        this, reg, std::placeholders::_1, std::placeholders::_2),
+                        this, reg, std::placeholders::_1,
+                        std::placeholders::_2),
               ::rmw_qos_profile_default, callback_group_);
       configured_set.insert(
           {reg->name,
-           std::pair<std::shared_ptr<ConfiguredHoldingRegister>,
-                     rclcpp::Service<
-                         modbus::srv::ConfiguredHoldingRegisterWrite>::SharedPtr>(
+           std::pair<
+               std::shared_ptr<ConfiguredHoldingRegister>,
+               rclcpp::Service<srv::ConfiguredHoldingRegisterWrite>::SharedPtr>(
                {reg, service_set})});
     }
   }
@@ -125,10 +127,8 @@ void Interface::generate_modbus_mappings(const std::string &prefix,
 
 void Interface::configured_holding_register_read_handler_(
     std::shared_ptr<ConfiguredHoldingRegister> reg,
-    const std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterRead::Request>
-        request,
-    std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterRead::Response>
-        response) {
+    const std::shared_ptr<srv::ConfiguredHoldingRegisterRead::Request> request,
+    std::shared_ptr<srv::ConfiguredHoldingRegisterRead::Response> response) {
   (void)request;  // no fields in the request
   configured_holding_register_read(reg, response->exception_code,
                                    response->value);
@@ -137,8 +137,8 @@ void Interface::configured_holding_register_read_handler_(
 void Interface::configured_holding_register_read(
     std::shared_ptr<ConfiguredHoldingRegister> reg, uint8_t &exception_code,
     uint16_t &value) {
-  auto req = std::make_shared<modbus::srv::HoldingRegisterRead::Request>();
-  auto resp = std::make_shared<modbus::srv::HoldingRegisterRead::Response>();
+  auto req = std::make_shared<srv::HoldingRegisterRead::Request>();
+  auto resp = std::make_shared<srv::HoldingRegisterRead::Response>();
 
   uint16_t leaf_id = leaf_id_.as_int();
   RCLCPP_DEBUG(node_->get_logger(),
@@ -179,28 +179,23 @@ void Interface::configured_holding_register_read(
 
 void Interface::configured_holding_register_write_handler_(
     std::shared_ptr<ConfiguredHoldingRegister> reg,
-    const std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterWrite::Request>
-        request,
-    std::shared_ptr<modbus::srv::ConfiguredHoldingRegisterWrite::Response>
-        response) {
-  configured_holding_register_write(reg,
-                                    request->value,
-                                    response->exception_code,
-				    response->value);
+    const std::shared_ptr<srv::ConfiguredHoldingRegisterWrite::Request> request,
+    std::shared_ptr<srv::ConfiguredHoldingRegisterWrite::Response> response) {
+  configured_holding_register_write(reg, request->value,
+                                    response->exception_code, response->value);
 }
 
 void Interface::configured_holding_register_write(
-    std::shared_ptr<ConfiguredHoldingRegister> reg,
-    uint16_t value,
-    uint8_t &exception_code,
-    uint16_t &response_value) {
-  auto req = std::make_shared<modbus::srv::HoldingRegisterWrite::Request>();
-  auto resp = std::make_shared<modbus::srv::HoldingRegisterWrite::Response>();
+    std::shared_ptr<ConfiguredHoldingRegister> reg, uint16_t value,
+    uint8_t &exception_code, uint16_t &response_value) {
+  auto req = std::make_shared<srv::HoldingRegisterWrite::Request>();
+  auto resp = std::make_shared<srv::HoldingRegisterWrite::Response>();
 
   uint16_t leaf_id = leaf_id_.as_int();
-  RCLCPP_DEBUG(node_->get_logger(),
-               "Writing '%u' to a configured holding register '%s' for leaf id: %d",
-               (unsigned int)value, reg->name.c_str(), leaf_id);
+  RCLCPP_DEBUG(
+      node_->get_logger(),
+      "Writing '%u' to a configured holding register '%s' for leaf id: %d",
+      (unsigned int)value, reg->name.c_str(), leaf_id);
   req->leaf_id = leaf_id;
   req->addr = reg->addr;
   req->value = value;
@@ -214,4 +209,4 @@ void Interface::configured_holding_register_write(
   response_value = resp->value;
 }
 
-}  // namespace modbus
+}  // namespace ros2_modbus

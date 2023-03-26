@@ -12,6 +12,6 @@
 
 #define MODBUS_CONFIG_CHAPTER_HOLDING_REGISTERS "holding_registers"
 
-namespace modbus {}
+namespace ros2_modbus {}
 
 #endif  // OPENVMP_MODBUS_CONFIG_H

@@ -27,7 +27,7 @@ more details.
 ```mermaid
 flowchart TB
     cli_serial["# Modbus debugging\n$ ros2 topic echo /modbus/example_bus"] .-> topic_modbus[/ROS2 interfaces:\n/modbus/example_bus/.../]
-    subgraph modbus["Library: modbus"]
+    subgraph modbus["Library: ros2_modbus"]
       topic_modbus
     end
     users["Client's\nconsumers"]
@@ -40,7 +40,7 @@ flowchart TB
       code_dds["Client code\nthat consumes\ntype definitions"]
       code_api["Client code\nthat consumes\nnative API"]
       code_dds --> topic_modbus
-      subgraph modbus_client_lib["Library: modbus"]
+      subgraph modbus_client_lib["Library: ros2_modbus"]
         generate["Generate\nregister\nmappings"]
         modbus_topics["ROS2 interface declarations"]
         modbus_client["Modbus client API"]
@@ -111,4 +111,3 @@ The same request and response data types are reused.
 ### Known Limitations
 
 - As of now, the only supported object type is 'Holding register'
-

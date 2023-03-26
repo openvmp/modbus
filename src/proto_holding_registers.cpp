@@ -9,16 +9,16 @@
 
 #include <functional>
 
-#include "modbus/config.hpp"
-#include "modbus/implementation.hpp"
-#include "modbus/protocol.hpp"
+#include "ros2_modbus/config.hpp"
+#include "ros2_modbus/implementation.hpp"
+#include "ros2_modbus/protocol.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace modbus {
+namespace ros2_modbus {
 
 void Implementation::holding_register_read(
-    const std::shared_ptr<modbus::srv::HoldingRegisterRead::Request> request,
-    std::shared_ptr<modbus::srv::HoldingRegisterRead::Response> response) {
+    const std::shared_ptr<srv::HoldingRegisterRead::Request> request,
+    std::shared_ptr<srv::HoldingRegisterRead::Response> response) {
   if (!request->leaf_id) {
     request->leaf_id = leaf_id_.as_int();
   }
@@ -31,8 +31,8 @@ void Implementation::holding_register_read(
 }
 
 void Implementation::holding_register_write(
-    const std::shared_ptr<modbus::srv::HoldingRegisterWrite::Request> request,
-    std::shared_ptr<modbus::srv::HoldingRegisterWrite::Response> response) {
+    const std::shared_ptr<srv::HoldingRegisterWrite::Request> request,
+    std::shared_ptr<srv::HoldingRegisterWrite::Response> response) {
   if (!request->leaf_id) {
     request->leaf_id = leaf_id_.as_int();
   }
@@ -45,9 +45,8 @@ void Implementation::holding_register_write(
 }
 
 void Implementation::holding_register_write_multiple(
-    const std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Request>
-        request,
-    std::shared_ptr<modbus::srv::HoldingRegisterWriteMultiple::Response>
+    const std::shared_ptr<srv::HoldingRegisterWriteMultiple::Request> request,
+    std::shared_ptr<srv::HoldingRegisterWriteMultiple::Response>
         response)  // TODO
 {
   if (!request->leaf_id) {
@@ -62,4 +61,4 @@ void Implementation::holding_register_write_multiple(
                       response->exception_code, ret);
 }
 
-}  // namespace modbus
+}  // namespace ros2_modbus
