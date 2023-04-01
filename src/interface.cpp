@@ -42,7 +42,7 @@ std::string Interface::get_prefix_() {
 void Interface::generate_modbus_mappings(const std::string &prefix,
                                          const std::string &config_filename) {
   RCLCPP_DEBUG(node_->get_logger(),
-               "_modbus::Interface::generate_modbus_mappings(%s, %s): started",
+               "modbus::Interface::generate_modbus_mappings(%s, %s): started",
                prefix.c_str(), config_filename.c_str());
 
   YAML::Node config = YAML::LoadFile(config_filename);
