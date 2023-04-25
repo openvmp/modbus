@@ -86,6 +86,11 @@ class Implementation : public Interface {
   rclcpp::Service<srv::ReadDeviceId>::SharedPtr srv_read_device_id;
 
  protected:
+  // init_modbus is called by child constructors or other child members
+  // when all the downstream modules are initialized and this modules is
+  // ready to take requests from the upstreams.
+  void init_modbus_();
+
   // TO BE IMPLEMENTED BY RTU/TCP/ASCII
   // Operations with holding registers
   virtual rclcpp::FutureReturnCode holding_register_read_handler_real_(

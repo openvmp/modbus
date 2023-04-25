@@ -22,35 +22,25 @@ namespace ros2_modbus {
 Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
   auto prefix = get_prefix_();
 
-  rmw_qos_profile_t rmw = {
-      .history = rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST,
-      .depth = 1,
-      .reliability =
-          rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT,
-      .durability = RMW_QOS_POLICY_DURABILITY_VOLATILE,
-      .deadline = {0, 50000000},
-      .lifespan = {0, 50000000},
-      .liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC,
-      .liveliness_lease_duration = {0, 0},
-      .avoid_ros_namespace_conventions = false,
-  };
-  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw), rmw);
-
 #ifndef MODBUS_STATS_DISABLE
   status_leafs_seen = node->create_publisher<std_msgs::msg::UInt8>(
-      prefix + "/status/leafs_seen", qos);
+      prefix + "/status/leafs_seen", 10);
 #endif  // MODBUS_STATS_DISABLE
   status_last_leaf = node->create_publisher<std_msgs::msg::UInt8>(
-      prefix + "/status/last_leaf", qos);
+      prefix + "/status/last_leaf", 10);
   status_last_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      prefix + "/status/last_seen", qos);
+      prefix + "/status/last_seen", 10);
 
   status_last_error_leaf = node->create_publisher<std_msgs::msg::UInt8>(
-      prefix + "/status/last_error_leaf", qos);
+      prefix + "/status/last_error_leaf", 10);
   status_last_exception_code = node->create_publisher<std_msgs::msg::UInt8>(
-      prefix + "/status/last_exception_code", qos);
+      prefix + "/status/last_exception_code", 10);
   status_last_error_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      prefix + "/status/last_error_seen", qos);
+      prefix + "/status/last_error_seen", 10);
+}
+
+void Implementation::init_modbus_() {
+  auto prefix = get_prefix_();
 
   srv_holding_register_read = node_->create_service<srv::HoldingRegisterRead>(
       prefix + MODBUS_SERVICE_HOLDING_REGISTER_READ,
@@ -83,33 +73,19 @@ Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
 
 Implementation::LeafInterface::LeafInterface(
     rclcpp::Node *node, const std::string &interface_prefix, uint8_t leaf_id) {
-  rmw_qos_profile_t rmw = {
-      .history = rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST,
-      .depth = 1,
-      .reliability =
-          rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT,
-      .durability = RMW_QOS_POLICY_DURABILITY_VOLATILE,
-      .deadline = {0, 50000000},
-      .lifespan = {0, 50000000},
-      .liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC,
-      .liveliness_lease_duration = {0, 0},
-      .avoid_ros_namespace_conventions = false,
-  };
-  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw), rmw);
-
   last_seen = node->create_publisher<std_msgs::msg::UInt64>(
-      interface_prefix + "/id" + std::to_string(leaf_id) + "/last_seen", qos);
+      interface_prefix + "/id" + std::to_string(leaf_id) + "/last_seen", 10);
   last_function_code = node->create_publisher<std_msgs::msg::UInt8>(
       interface_prefix + "/id" + std::to_string(leaf_id) +
           "/last_function_code",
-      qos);
+      10);
   last_exception_code = node->create_publisher<std_msgs::msg::UInt8>(
       interface_prefix + "/id" + std::to_string(leaf_id) +
           "/last_exception_code",
-      qos);
+      10);
   last_error_seen = node->create_publisher<std_msgs::msg::UInt64>(
       interface_prefix + "/id" + std::to_string(leaf_id) + "/last_error_seen",
-      qos);
+      10);
 }
 
 void Implementation::leafs_seen_bitmap_update_(uint8_t leaf_id) {
