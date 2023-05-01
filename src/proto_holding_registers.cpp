@@ -9,12 +9,12 @@
 
 #include <functional>
 
-#include "ros2_modbus/config.hpp"
-#include "ros2_modbus/implementation.hpp"
-#include "ros2_modbus/protocol.hpp"
+#include "remote_modbus/config.hpp"
+#include "remote_modbus/implementation.hpp"
+#include "remote_modbus/protocol.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 void Implementation::holding_register_read(
     const std::shared_ptr<srv::HoldingRegisterRead::Request> request,
@@ -61,4 +61,4 @@ void Implementation::holding_register_write_multiple(
                       response->exception_code, ret);
 }
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus

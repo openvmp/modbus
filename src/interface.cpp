@@ -7,17 +7,17 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_modbus/interface.hpp"
+#include "remote_modbus/interface.hpp"
 
 #include <functional>
 
-#include "ros2_modbus/config.hpp"
-#include "ros2_modbus/protocol.hpp"
-#include "ros2_modbus/srv/configured_holding_register_read.hpp"
-#include "ros2_modbus/srv/configured_holding_register_write.hpp"
+#include "remote_modbus/config.hpp"
+#include "remote_modbus/protocol.hpp"
+#include "remote_modbus/srv/configured_holding_register_read.hpp"
+#include "remote_modbus/srv/configured_holding_register_write.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 Interface::Interface(rclcpp::Node *node) : node_{node} {
   callback_group_ =
@@ -209,4 +209,4 @@ void Interface::configured_holding_register_write(
   response_value = resp->value;
 }
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus

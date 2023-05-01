@@ -7,17 +7,17 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_modbus/implementation.hpp"
+#include "remote_modbus/implementation.hpp"
 
 #include <functional>
 
-#include "ros2_modbus/config.hpp"
-#include "ros2_modbus/protocol.hpp"
-#include "ros2_modbus/srv/configured_holding_register_read.hpp"
-#include "ros2_modbus/srv/configured_holding_register_write.hpp"
+#include "remote_modbus/config.hpp"
+#include "remote_modbus/protocol.hpp"
+#include "remote_modbus/srv/configured_holding_register_read.hpp"
+#include "remote_modbus/srv/configured_holding_register_write.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 Implementation::Implementation(rclcpp::Node *node) : Interface(node) {
   auto prefix = get_prefix_();
@@ -173,4 +173,4 @@ void Implementation::update_on_response_(uint8_t leaf_id, uint8_t fc,
   }
 }
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus

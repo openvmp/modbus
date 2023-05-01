@@ -15,9 +15,9 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_modbus/interface.hpp"
+#include "remote_modbus/interface.hpp"
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 class RemoteInterface final : public Interface {
  public:
@@ -52,6 +52,6 @@ class RemoteInterface final : public Interface {
   rclcpp::Client<srv::ReadDeviceId>::SharedPtr clnt_read_device_id;
 };
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus
 
 #endif  // OPENVMP_MODBUS_INTERFACE_REMOTE_H

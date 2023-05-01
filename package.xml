@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>ros2_modbus</name>
+  <name>remote_modbus</name>
   <version>0.0.1</version>
   <description>An ultimate C++ implementation of Modbus for ROS2</description>
   <maintainer email="openvmp@proton.me">Roman Kuzmenko</maintainer>

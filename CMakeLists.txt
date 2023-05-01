@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(ros2_modbus)
+project(remote_modbus)
 
 # Compiler settings
 if(NOT CMAKE_CXX_STANDARD)

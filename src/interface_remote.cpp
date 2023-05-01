@@ -7,15 +7,15 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_modbus/interface_remote.hpp"
+#include "remote_modbus/interface_remote.hpp"
 
 #include <functional>
 
-#include "ros2_modbus/config.hpp"
-#include "ros2_modbus/protocol.hpp"
+#include "remote_modbus/config.hpp"
+#include "remote_modbus/protocol.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 RemoteInterface::RemoteInterface(rclcpp::Node *node) : Interface(node) {
   auto prefix = get_prefix_();
@@ -117,4 +117,4 @@ void RemoteInterface::read_device_id(
   *response = *f.get();
 }
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus

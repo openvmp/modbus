@@ -16,12 +16,12 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/time.hpp"
-#include "ros2_modbus/interface.hpp"
-#include "ros2_modbus/srv/get_com_event_log.hpp"
-#include "ros2_modbus/srv/holding_register_read.hpp"
-#include "ros2_modbus/srv/holding_register_write.hpp"
-#include "ros2_modbus/srv/holding_register_write_multiple.hpp"
-#include "ros2_modbus/srv/read_device_id.hpp"
+#include "remote_modbus/interface.hpp"
+#include "remote_modbus/srv/get_com_event_log.hpp"
+#include "remote_modbus/srv/holding_register_read.hpp"
+#include "remote_modbus/srv/holding_register_write.hpp"
+#include "remote_modbus/srv/holding_register_write_multiple.hpp"
+#include "remote_modbus/srv/read_device_id.hpp"
 #include "std_msgs/msg/u_int16.hpp"
 #include "std_msgs/msg/u_int64.hpp"
 #include "std_msgs/msg/u_int8.hpp"
@@ -38,7 +38,7 @@
     MODBUS_PUBLISH(type, name, name##_value_) \
   }
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 class Implementation : public Interface {
  public:
@@ -141,6 +141,6 @@ class Implementation : public Interface {
       std::shared_ptr<srv::ReadDeviceId::Response> response) override;
 };
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus
 
 #endif  // OPENVMP_MODBUS_IMPLEMENTATION_H

@@ -7,13 +7,13 @@
  * Licensed under Apache License, Version 2.0.
  */
 
-#include "ros2_modbus/factory.hpp"
+#include "remote_modbus/factory.hpp"
 
 #include <exception>
 
-#include "ros2_modbus/interface_remote.hpp"
+#include "remote_modbus/interface_remote.hpp"
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 std::shared_ptr<Interface> Factory::New(rclcpp::Node *node) {
   rclcpp::Parameter use_remote;
@@ -34,4 +34,4 @@ std::shared_ptr<Interface> Factory::New(rclcpp::Node *node) {
   }
 }
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus

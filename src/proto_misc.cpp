@@ -9,12 +9,12 @@
 
 #include <functional>
 
-#include "ros2_modbus/config.hpp"
-#include "ros2_modbus/implementation.hpp"
-#include "ros2_modbus/protocol.hpp"
+#include "remote_modbus/config.hpp"
+#include "remote_modbus/implementation.hpp"
+#include "remote_modbus/protocol.hpp"
 #include "yaml-cpp/yaml.h"
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 void Implementation::get_com_event_log(
     const std::shared_ptr<srv::GetComEventLog::Request> request,
@@ -38,4 +38,4 @@ void Implementation::read_device_id(
                       response->exception_code, ret);
 }
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus

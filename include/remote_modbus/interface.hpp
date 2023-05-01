@@ -12,13 +12,13 @@
 
 #include "rclcpp/callback_group.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_modbus/srv/configured_holding_register_read.hpp"
-#include "ros2_modbus/srv/configured_holding_register_write.hpp"
-#include "ros2_modbus/srv/get_com_event_log.hpp"
-#include "ros2_modbus/srv/holding_register_read.hpp"
-#include "ros2_modbus/srv/holding_register_write.hpp"
-#include "ros2_modbus/srv/holding_register_write_multiple.hpp"
-#include "ros2_modbus/srv/read_device_id.hpp"
+#include "remote_modbus/srv/configured_holding_register_read.hpp"
+#include "remote_modbus/srv/configured_holding_register_write.hpp"
+#include "remote_modbus/srv/get_com_event_log.hpp"
+#include "remote_modbus/srv/holding_register_read.hpp"
+#include "remote_modbus/srv/holding_register_write.hpp"
+#include "remote_modbus/srv/holding_register_write_multiple.hpp"
+#include "remote_modbus/srv/read_device_id.hpp"
 
 #define MODBUS_SERVICE_HOLDING_REGISTER_READ "/holding_register_read"
 #define MODBUS_SERVICE_HOLDING_REGISTER_WRITE "/holding_register_write"
@@ -27,7 +27,7 @@
 #define MODBUS_SERVICE_GET_COM_VENT_LOG "/get_com_event_log"
 #define MODBUS_SERVICE_READ_DEBICE_ID "/read_device_id"
 
-namespace ros2_modbus {
+namespace remote_modbus {
 
 class Interface {
  public:
@@ -109,6 +109,6 @@ class Interface {
       std::shared_ptr<srv::ConfiguredHoldingRegisterWrite::Response> response);
 };
 
-}  // namespace ros2_modbus
+}  // namespace remote_modbus
 
 #endif  // OPENVMP_MODBUS_INTERFACE_H
