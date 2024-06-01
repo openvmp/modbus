@@ -40,6 +40,15 @@ class RemoteInterface final : public Interface {
   virtual void read_device_id(
       const std::shared_ptr<srv::ReadDeviceId::Request> request,
       std::shared_ptr<srv::ReadDeviceId::Response> response) override;
+    virtual void coil_read(                                              //revision_1_ahmed_nazar
+        const std::shared_ptr<srv::CoilRead::Request> request,
+        std::shared_ptr<srv::CoilRead::Response> response) override;
+    virtual void coil_write(                                             
+        const std::shared_ptr<srv::CoilWrite::Request> request,
+        std::shared_ptr<srv::CoilWrite::Response> response) override;
+    virtual void coil_continuous_write(                                             
+        const std::shared_ptr<srv::CoilContinuousWrite::Request> request,
+        std::shared_ptr<srv::CoilContinuousWrite::Response> response) override;
 
  private:
   rclcpp::Client<srv::HoldingRegisterRead>::SharedPtr
@@ -48,6 +57,12 @@ class RemoteInterface final : public Interface {
       clnt_holding_register_write;
   rclcpp::Client<srv::HoldingRegisterWriteMultiple>::SharedPtr
       clnt_holding_register_write_multiple;
+  rclcpp::Client<srv::CoilRead>::SharedPtr                                    //revision_1_ahmed_nazar
+      clnt_coil_read;
+  rclcpp::Client<srv::CoilWrite>::SharedPtr                                    //revision_1_ahmed_nazar
+      clnt_coil_write;
+  rclcpp::Client<srv::CoilContinuousWrite>::SharedPtr                                    //revision_1_ahmed_nazar
+      clnt_coil_continuous_write;    
   rclcpp::Client<srv::GetComEventLog>::SharedPtr clnt_get_com_event_log;
   rclcpp::Client<srv::ReadDeviceId>::SharedPtr clnt_read_device_id;
 };

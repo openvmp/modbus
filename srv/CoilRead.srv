@@ -1,0 +1,19 @@
+uint8 leaf_id
+uint16 addr
+uint16 count
+---
+
+uint8 exception_code
+uint8 len
+uint8[] values
+
+
+#request
+#uint8 leaf_id ==> station number ==> 1 byte
+#uint16 addr   ==> addrress       ==> 2 byte
+#uint16 count  ==> how many addrs ==> 2 byte
+# ---
+#response
+#uint8 exception_code   1byte
+#uint8 len              1byte
+#uint8[] values         1byte x count
