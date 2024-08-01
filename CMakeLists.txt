@@ -26,7 +26,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/HoldingRegisterWriteMultiple.srv"
   "srv/GetComEventLog.srv"
   "srv/ReadDeviceId.srv"
-  "srv/CoilRead.srv"                       #revision_1_ahmed_nazar: service .srv added
+  "srv/CoilRead.srv"
   "srv/CoilWrite.srv"
   "srv/CoilContinuousWrite.srv"
 )

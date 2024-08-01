@@ -10,8 +10,8 @@
 #ifndef OPENVMP_MODBUS_PROTOCOL_H
 #define OPENVMP_MODBUS_PROTOCOL_H
 
-#define MODBUS_FC_READ_COIL ((uint8_t)0x01)           //revision_1_ahmed_nazar
-#define MODBUS_FC_WRITE_COIL ((uint8_t)0x05)           //revision_1_ahmed_nazar
+#define MODBUS_FC_READ_COIL ((uint8_t)0x01)
+#define MODBUS_FC_WRITE_COIL ((uint8_t)0x05)
 #define MODBUS_FC_WRITE_COIL_CONTINUOUS ((uint8_t)0x0F)
 #define MODBUS_FC_READ_HOLDING_REGISTERS ((uint8_t)0x03)
 #define MODBUS_FC_PRESET_SINGLE_REGISTER ((uint8_t)0x06)
