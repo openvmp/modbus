@@ -70,23 +70,23 @@ void Implementation::init_modbus_() {
                 std::placeholders::_2),
       ::rmw_qos_profile_default, callback_group_);
 
-  srv_coil_read = node_->create_service<srv::CoilRead>(          //revision_1_ahmed_nazar: creating the Coil read service
+  srv_coil_read = node_->create_service<srv::CoilRead>(
       prefix + MODBUS_SERVICE_COIL_READ,
       std::bind(&Interface::coil_read, this, std::placeholders::_1,
                 std::placeholders::_2),
       ::rmw_qos_profile_default, callback_group_);
 
-  srv_coil_write = node_->create_service<srv::CoilWrite>(          //revision_1_ahmed_nazar: creating the Coil write service
-    prefix + MODBUS_SERVICE_COIL_WRITE,
-    std::bind(&Interface::coil_write, this, std::placeholders::_1,
-              std::placeholders::_2),
-    ::rmw_qos_profile_default, callback_group_);
+  srv_coil_write = node_->create_service<srv::CoilWrite>(
+      prefix + MODBUS_SERVICE_COIL_WRITE,
+      std::bind(&Interface::coil_write, this, std::placeholders::_1,
+                std::placeholders::_2),
+      ::rmw_qos_profile_default, callback_group_);
 
-      srv_coil_continuous_write = node_->create_service<srv::CoilContinuousWrite>(          //revision_1_ahmed_nazar: creating the Coil write multiple service
-    prefix + MODBUS_SERVICE_COIL_CONTINUOUS_WRITE,
-    std::bind(&Interface::coil_continuous_write, this, std::placeholders::_1,
-              std::placeholders::_2),
-    ::rmw_qos_profile_default, callback_group_);
+  srv_coil_continuous_write = node_->create_service<srv::CoilContinuousWrite>(
+      prefix + MODBUS_SERVICE_COIL_CONTINUOUS_WRITE,
+      std::bind(&Interface::coil_continuous_write, this, std::placeholders::_1,
+                std::placeholders::_2),
+      ::rmw_qos_profile_default, callback_group_);
 }
 
 Implementation::LeafInterface::LeafInterface(

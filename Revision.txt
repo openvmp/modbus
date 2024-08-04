@@ -1,4 +1,0 @@
-this is a record of All the changes:
-
-1-CMakeLists.txt:
-      "srv/CoilRead.srv"                       service .srv added
