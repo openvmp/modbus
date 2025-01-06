@@ -17,6 +17,9 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/time.hpp"
 #include "remote_modbus/interface.hpp"
+#include "remote_modbus/srv/coil_continuous_write.hpp"
+#include "remote_modbus/srv/coil_read.hpp"
+#include "remote_modbus/srv/coil_write.hpp"
 #include "remote_modbus/srv/get_com_event_log.hpp"
 #include "remote_modbus/srv/holding_register_read.hpp"
 #include "remote_modbus/srv/holding_register_write.hpp"
@@ -82,6 +85,10 @@ class Implementation : public Interface {
       srv_holding_register_write;
   rclcpp::Service<srv::HoldingRegisterWriteMultiple>::SharedPtr
       srv_holding_register_write_multiple;
+  rclcpp::Service<srv::CoilRead>::SharedPtr srv_coil_read;
+  rclcpp::Service<srv::CoilWrite>::SharedPtr srv_coil_write;
+  rclcpp::Service<srv::CoilContinuousWrite>::SharedPtr
+      srv_coil_continuous_write;
   rclcpp::Service<srv::GetComEventLog>::SharedPtr srv_get_com_event_log;
   rclcpp::Service<srv::ReadDeviceId>::SharedPtr srv_read_device_id;
 
@@ -104,6 +111,16 @@ class Implementation : public Interface {
       const std::shared_ptr<srv::HoldingRegisterWriteMultiple::Request> request,
       std::shared_ptr<srv::HoldingRegisterWriteMultiple::Response>
           response) = 0;
+  // Operations with coils
+  virtual rclcpp::FutureReturnCode coil_read_handler_real_(
+      const std::shared_ptr<srv::CoilRead::Request> request,
+      std::shared_ptr<srv::CoilRead::Response> response) = 0;
+  virtual rclcpp::FutureReturnCode coil_write_handler_real_(
+      const std::shared_ptr<srv::CoilWrite::Request> request,
+      std::shared_ptr<srv::CoilWrite::Response> response) = 0;
+  virtual rclcpp::FutureReturnCode coil_continuous_write_handler_real_(
+      const std::shared_ptr<srv::CoilContinuousWrite::Request> request,
+      std::shared_ptr<srv::CoilContinuousWrite::Response> response) = 0;
   // Misc operations
   virtual rclcpp::FutureReturnCode get_com_event_log_handler_real_(
       const std::shared_ptr<srv::GetComEventLog::Request> request,
@@ -139,6 +156,15 @@ class Implementation : public Interface {
   virtual void read_device_id(
       const std::shared_ptr<srv::ReadDeviceId::Request> request,
       std::shared_ptr<srv::ReadDeviceId::Response> response) override;
+  virtual void coil_read(
+      const std::shared_ptr<srv::CoilRead::Request> request,
+      std::shared_ptr<srv::CoilRead::Response> response) override;
+  virtual void coil_write(
+      const std::shared_ptr<srv::CoilWrite::Request> request,
+      std::shared_ptr<srv::CoilWrite::Response> response) override;
+  virtual void coil_continuous_write(
+      const std::shared_ptr<srv::CoilContinuousWrite::Request> request,
+      std::shared_ptr<srv::CoilContinuousWrite::Response> response) override;
 };
 
 }  // namespace remote_modbus

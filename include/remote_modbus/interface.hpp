@@ -12,6 +12,9 @@
 
 #include "rclcpp/callback_group.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "remote_modbus/srv/coil_continuous_write.hpp"
+#include "remote_modbus/srv/coil_read.hpp"
+#include "remote_modbus/srv/coil_write.hpp"
 #include "remote_modbus/srv/configured_holding_register_read.hpp"
 #include "remote_modbus/srv/configured_holding_register_write.hpp"
 #include "remote_modbus/srv/get_com_event_log.hpp"
@@ -20,6 +23,9 @@
 #include "remote_modbus/srv/holding_register_write_multiple.hpp"
 #include "remote_modbus/srv/read_device_id.hpp"
 
+#define MODBUS_SERVICE_COIL_READ "/coil_read"
+#define MODBUS_SERVICE_COIL_WRITE "/coil_write"
+#define MODBUS_SERVICE_COIL_CONTINUOUS_WRITE "/coil_continuous_write"
 #define MODBUS_SERVICE_HOLDING_REGISTER_READ "/holding_register_read"
 #define MODBUS_SERVICE_HOLDING_REGISTER_WRITE "/holding_register_write"
 #define MODBUS_SERVICE_HOLDING_REGISTER_WRITE_MULTIPLE \
@@ -75,6 +81,14 @@ class Interface {
   virtual void read_device_id(
       const std::shared_ptr<srv::ReadDeviceId::Request> request,
       std::shared_ptr<srv::ReadDeviceId::Response> response) = 0;
+  virtual void coil_read(const std::shared_ptr<srv::CoilRead::Request> request,
+                         std::shared_ptr<srv::CoilRead::Response> response) = 0;
+  virtual void coil_write(
+      const std::shared_ptr<srv::CoilWrite::Request> request,
+      std::shared_ptr<srv::CoilWrite::Response> response) = 0;
+  virtual void coil_continuous_write(
+      const std::shared_ptr<srv::CoilContinuousWrite::Request> request,
+      std::shared_ptr<srv::CoilContinuousWrite::Response> response) = 0;
 
  protected:
   rclcpp::Node *node_;

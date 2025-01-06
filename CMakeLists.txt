@@ -26,6 +26,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/HoldingRegisterWriteMultiple.srv"
   "srv/GetComEventLog.srv"
   "srv/ReadDeviceId.srv"
+  "srv/CoilRead.srv"
+  "srv/CoilWrite.srv"
+  "srv/CoilContinuousWrite.srv"
 )
 rosidl_get_typesupport_target(cpp_typesupport_target
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
@@ -41,6 +44,7 @@ set(project_SOURCE_FILES
   src/implementation.cpp
   src/proto_holding_registers.cpp
   src/proto_misc.cpp
+  src/coil_read_write.cpp
 )
 
 set(project_LIBRARIES
